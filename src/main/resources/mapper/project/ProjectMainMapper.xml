@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anything.odoc.project.dao.ProjectMainDao">
+
+        <select id="getProjectMainList" resultType="com.anything.odoc.project.vo.ProjectMainVO">
+            /* ProjectMainDao.getProjectMainList */
+            SELECT
+                odoc_sn
+                , user_id
+                , odoc_nm
+                , to_char(frst_reg_dt, 'YYYY. MM. DD') as frst_reg_dt
+                , del_yn
+            FROM t_odoc_main
+            where user_id = #{userId}
+        </select>
+
+</mapper>
