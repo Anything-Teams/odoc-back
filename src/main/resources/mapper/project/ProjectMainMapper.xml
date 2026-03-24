@@ -4,17 +4,174 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.anything.odoc.project.dao.ProjectMainDao">
-
-        <select id="getProjectMainList" resultType="com.anything.odoc.project.vo.ProjectMainVO">
+        <select id="getProjectMainList" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
             /* ProjectMainDao.getProjectMainList */
-            SELECT
+            select
                 odoc_sn
                 , user_id
                 , odoc_nm
                 , to_char(frst_reg_dt, 'YYYY. MM. DD') as frst_reg_dt
                 , del_yn
-            FROM t_odoc_main
+            from t_odoc_main
             where user_id = #{userId}
+            order by case when del_yn = 'N' then 0 else 1 end asc, odoc_sn desc
         </select>
+
+        <select id="getProjectMain" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
+            /* ProjectMainDao.getProjectMain */
+            select
+                a.odoc_sn
+                , a.user_id
+                , a.odoc_nm
+                , to_char(a.frst_reg_dt, 'YYYY. MM. DD') as frst_reg_dt
+                , a.del_yn
+                , TO_CHAR((CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date, 'MM') AS odoc_month
+                , ROUND(
+                        COUNT(DISTINCT DATE(b.odoc_dt))::numeric
+                        / EXTRACT(DAY FROM DATE_TRUNC('month', (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date) + INTERVAL '1 month - 1 day')
+                        * 100
+                  , 1) AS progress
+                , CASE
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM t_odoc_dtl d
+                        WHERE d.user_id = a.user_id
+                          AND d.odoc_sn = a.odoc_sn
+                          AND DATE(d.odoc_dt) = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date
+                    )
+                THEN 1
+                ELSE 0
+                END AS odoc_yn
+            from t_odoc_main a
+            left join t_odoc_dtl b
+            on a.user_id = b.user_id
+            and a.odoc_sn = b.odoc_sn
+            and b.odoc_dt <![CDATA[ >= ]]> DATE_TRUNC('month', (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date)
+            and b.odoc_dt <![CDATA[ < ]]> DATE_TRUNC('month', (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date) + INTERVAL '1 month'
+            where a.user_id = #{userId}
+            and a.odoc_sn = #{odocSn}
+            group by a.odoc_sn, a.user_id, a.odoc_nm, a.frst_reg_dt, a.del_yn
+        </select>
+
+        <select id="getHistYearList" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
+            /* ProjectMainDao.getHistYearList */
+            select
+                TO_CHAR(b.odoc_dt, 'YYYY') AS year
+                , TO_CHAR(b.odoc_dt, 'MM') AS month
+                , ROUND(
+                    COUNT(DISTINCT DATE(b.odoc_dt))::numeric
+                    / EXTRACT(
+                        DAY FROM DATE_TRUNC('month', b.odoc_dt) + INTERVAL '1 month - 1 day'
+                    )
+                    * 100
+                , 1) AS progress
+            from t_odoc_main a
+            left join t_odoc_dtl b
+            on a.user_id = b.user_id
+            and a.odoc_sn = b.odoc_sn
+            where a.user_id = #{userId}
+            and a.odoc_sn = #{odocSn}
+            and b.odoc_dt IS NOT NULL
+            group by
+                TO_CHAR(b.odoc_dt, 'YYYY'), TO_CHAR(b.odoc_dt, 'MM'), DATE_TRUNC('month', b.odoc_dt)
+            order by year desc, month desc
+        </select>
+
+        <select id="getHistMonth" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMonthVO">
+            /* ProjectMainDao.getHistMonth */
+            select
+                a.odoc_nm
+                ,CASE WHEN DATE_TRUNC('month', a.frst_reg_dt) = DATE_TRUNC('month', TO_DATE(#{year} || '-' || #{month}, 'YYYY-MM'))
+                    THEN TO_CHAR(a.frst_reg_dt, 'DD')::int
+                    ELSE NULL
+                END AS created_day
+                , ARRAY_TO_STRING(
+                    ARRAY_AGG(DISTINCT TO_CHAR(DATE(b.odoc_dt), 'DD')),
+                    ','
+                ) AS checked_dates
+                , ROUND(
+                    COUNT(DISTINCT DATE(b.odoc_dt))::numeric
+                    / EXTRACT(
+                    DAY FROM DATE_TRUNC('month', TO_DATE(#{year} || '-' || #{month}, 'YYYY-MM'))
+                    + INTERVAL '1 month - 1 day'
+                    )
+                    * 100
+                , 1) AS progress
+            from t_odoc_main a
+            left join t_odoc_dtl b
+            on a.user_id = b.user_id
+            and a.odoc_sn = b.odoc_sn
+            and b.odoc_dt >= DATE_TRUNC('month', TO_DATE(#{year} || '-' || #{month}, 'YYYY-MM'))
+            and b.odoc_dt <![CDATA[ < ]]> DATE_TRUNC('month', TO_DATE(#{year} || '-' || #{month}, 'YYYY-MM')) + INTERVAL '1 month'
+            where a.user_id = #{userId}
+            and a.odoc_sn = #{odocSn}
+            group by a.odoc_nm, a.frst_reg_dt
+        </select>
+
+        <select id="getProjectName" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
+            /* ProjectMainDao.getProjectName */
+            select
+                odoc_nm
+            from t_odoc_main
+            where user_id = #{userId}
+            and odoc_sn = #{odocSn}
+        </select>
+
+        <update id="updateProject" parameterType="com.anything.odoc.project.vo.ProjectMainVO">
+            /* ProjectMainDao.updateProject */
+            update t_odoc_main set
+                <if test="delYn != null and delYn != ''">
+                    del_yn = #{delYn}
+                </if>
+                <if test="odocNm != null and odocNm != ''">
+                    odoc_nm = #{odocNm}
+                </if>
+            where user_id = #{userId}
+            and odoc_sn = #{odocSn}
+        </update>
+
+        <insert id="insertProject" parameterType="com.anything.odoc.project.vo.ProjectMainVO">
+            /* ProjectMainDao.insertProject */
+            insert into t_odoc_main
+            (
+                odoc_sn
+                , user_id
+                , odoc_nm
+                , frst_reg_dt
+            )
+            values
+            (
+                (select max(odoc_sn) + 1 from t_odoc_main where user_id = #{userId})
+                , #{userId}
+                , #{odocNm}
+                , (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date
+            )
+        </insert>
+
+        <insert id="commitProject" parameterType="com.anything.odoc.project.vo.ProjectMainVO">
+            /* ProjectMainDao.commitProject */
+            insert into t_odoc_dtl
+            (
+                odoc_sn
+                , user_id
+                , odoc_day_sn
+                , odoc_dt
+                , frst_reg_dt
+            )
+            values
+            (
+                #{odocSn}
+                , #{userId}
+                , COALESCE((
+                    select
+                        max(odoc_day_sn) + 1
+                    from t_odoc_dtl
+                    where user_id = #{userId}
+                    and odoc_sn = #{odocSn}
+                    ), 1)
+                , (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date
+                , (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date
+            )
+        </insert>
 
 </mapper>
