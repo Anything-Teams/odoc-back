@@ -73,7 +73,7 @@ public class ProjectMainController {
     }
 
     @GetMapping("/healthCheck)")
-    public String getProjectMainList() {
+    public String healthCheck() {
         return "ok";
     }
 }
