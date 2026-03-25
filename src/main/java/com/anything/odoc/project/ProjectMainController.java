@@ -3,11 +3,11 @@ package com.anything.odoc.project;
 import com.anything.odoc.project.vo.ProjectMainVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -70,5 +70,10 @@ public class ProjectMainController {
         } else {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @GetMapping("/healthCheck)")
+    public String getProjectMainList() {
+        return "ok";
     }
 }
