@@ -24,4 +24,8 @@ public interface ProjectMainDao {
     int insertProject(ProjectMainVO projectMainVO);
 
     int commitProject(ProjectMainVO projectMainVO);
+
+    ProjectMainVO getTempUser(ProjectMainVO projectMainVO);
+
+    int updateTempUser(ProjectMainVO projectMainVO);
 }
