@@ -14,10 +14,4 @@ public class TestController {
         testvo.setTestNm(testService.selectName());
         return testvo;
     }
-
-    @GetMapping("/test")
-    public TestVO getTest(TestVO testvo) {
-        testvo.setTestNm("getTestNm");
-        return testvo;
-    }
 }
