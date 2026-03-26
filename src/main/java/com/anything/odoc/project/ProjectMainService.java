@@ -82,12 +82,4 @@ public class ProjectMainService {
     public int commitProject(ProjectMainVO projectMainVO) {
         return projectMainDao.commitProject(projectMainVO);
     }
-
-    public ProjectMainVO getTempUser(ProjectMainVO projectMainVO) {
-        return projectMainDao.getTempUser(projectMainVO);
-    }
-
-    public int updateTempUser(ProjectMainVO projectMainVO) {
-        return projectMainDao.updateTempUser(projectMainVO);
-    }
 }

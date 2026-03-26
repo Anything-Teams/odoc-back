@@ -1,6 +1,7 @@
 package com.anything.odoc.project;
 
 import com.anything.odoc.project.dao.ProjectMainDao;
+import com.anything.odoc.project.vo.ProjectMainVO;
 import com.anything.odoc.project.vo.ProjectUserVO;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,4 +41,7 @@ public class ProjectUserService {
         return loginUser;
     }
 
+    public int updateAlert(ProjectUserVO projectUserVO) {
+        return projectMainDao.updateAlert(projectUserVO);
+    }
 }

@@ -31,11 +31,19 @@
         SELECT
              USER_ID
              ,USER_PW
-             ,USER_STATE
-             ,FRST_REG_DT
+--              ,USER_STATE
+--              ,FRST_REG_DT
+             , IS_MOTIVATION_ALERT
         FROM T_USER
         WHERE USER_ID = #{userId}
           AND USER_STATE = 'Y'
     </select>
+
+    <update id="updateAlert" parameterType="com.anything.odoc.project.vo.ProjectMainVO">
+        /* ProjectMainDao.updateAlert */
+        update t_user set
+            is_motivation_alert = #{isMotivationAlert}
+        where user_id = #{userId}
+    </update>
 
 </mapper>

@@ -1,5 +1,6 @@
 package com.anything.odoc.project;
 
+import com.anything.odoc.project.vo.ProjectMainVO;
 import com.anything.odoc.project.vo.ProjectUserVO;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,4 +55,19 @@ public class ProjectUserController {
         return ResponseEntity.ok(loginUser);
     }
 
+    @PostMapping("/userLogout")
+    public ResponseEntity<?> logout(HttpSession session) {
+        session.invalidate();
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/updateAlert")
+    public ResponseEntity<Integer> updateAlert(@RequestBody ProjectUserVO projectUserVO) {
+        int result = projectUserService.updateAlert(projectUserVO);
+        if (result > 0) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

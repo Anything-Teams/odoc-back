@@ -17,7 +17,4 @@ public class ProjectMainVO {
 
     private String year;
     private String month;
-
-    //temp
-    private String isMotivationAlert;
 }

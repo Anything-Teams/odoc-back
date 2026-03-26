@@ -76,19 +76,4 @@ public class ProjectMainController {
     public String healthCheck() {
         return "ok";
     }
-
-    @PostMapping("/getTempUser")
-    public ProjectMainVO getTempUser(@RequestBody ProjectMainVO projectMainVO) {
-        return projectMainService.getTempUser(projectMainVO);
-    }
-
-    @PostMapping("/updateTempUser")
-    public ResponseEntity<Integer> updateTempUser(@RequestBody ProjectMainVO projectMainVO) {
-        int result = projectMainService.updateTempUser(projectMainVO);
-        if (result > 0) {
-            return ResponseEntity.ok(result);
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
-    }
 }

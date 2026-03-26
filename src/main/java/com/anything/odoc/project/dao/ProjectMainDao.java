@@ -26,9 +26,7 @@ public interface ProjectMainDao {
 
     int commitProject(ProjectMainVO projectMainVO);
 
-    ProjectMainVO getTempUser(ProjectMainVO projectMainVO);
-
-    int updateTempUser(ProjectMainVO projectMainVO);
+    int updateAlert(ProjectUserVO projectUserVO);
 
     int userIdCheck(ProjectUserVO projectUserVO);
 

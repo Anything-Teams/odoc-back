@@ -171,20 +171,4 @@
             , (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
         )
     </insert>
-
-
-    <select id="getTempUser" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
-        /* ProjectMainDao.getTempUser */
-        select
-            is_motivation_alert
-        from t_user
-        where user_id = #{userId}
-    </select>
-
-    <update id="updateTempUser" parameterType="com.anything.odoc.project.vo.ProjectMainVO">
-        /* ProjectMainDao.updateTempUser */
-        update t_user set
-            is_motivation_alert = #{isMotivationAlert}
-        where user_id = #{userId}
-    </update>
 </mapper>

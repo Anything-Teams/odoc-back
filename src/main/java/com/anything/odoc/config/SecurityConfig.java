@@ -20,12 +20,26 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/login",
+                                "/userLogin",
                                 "/signup",
                                 "/userIdCheck",
                                 "/userRegister",
+                                "/healthCheck",
+                                "/test",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**"
+                        ).permitAll()
+                        .requestMatchers(
+                                "/getProjectMainList",
+                                "/getProjectMain",
+                                "/getHistYearList",
+                                "/getHistMonth",
+                                "/getProjectName",
+                                "/updateProject",
+                                "/insertProject",
+                                "/commitProject",
+                                "/updateAlert"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
