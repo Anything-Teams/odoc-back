@@ -9,6 +9,7 @@ public class ProjectMainVO {
     private String odocNm;
     private String frstRegDt;
     private String delYn;
+    private String endYn;
 
     private String odocMonth;
     private String progress;

@@ -11,10 +11,11 @@
                 , user_id
                 , odoc_nm
                 , to_char(frst_reg_dt, 'YYYY. MM. DD') as frst_reg_dt
-                , del_yn
+                , end_yn
             from t_odoc_main
             where user_id = #{userId}
-            order by case when del_yn = 'N' then 0 else 1 end asc, odoc_sn desc
+            and del_yn = 'N'
+            order by case when end_yn = 'N' then 0 else 1 end asc, odoc_sn desc
         </select>
 
         <select id="getProjectMain" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
@@ -24,7 +25,7 @@
                 , a.user_id
                 , a.odoc_nm
                 , to_char(a.frst_reg_dt, 'YYYY. MM. DD') as frst_reg_dt
-                , a.del_yn
+                , a.end_yn
                 , TO_CHAR((CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date, 'MM') AS odoc_month
                 , ROUND(
                         COUNT(DISTINCT DATE(b.odoc_dt))::numeric
@@ -50,7 +51,7 @@
             and b.odoc_dt <![CDATA[ < ]]> DATE_TRUNC('month', (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date) + INTERVAL '1 month'
             where a.user_id = #{userId}
             and a.odoc_sn = #{odocSn}
-            group by a.odoc_sn, a.user_id, a.odoc_nm, a.frst_reg_dt, a.del_yn
+            group by a.odoc_sn, a.user_id, a.odoc_nm, a.frst_reg_dt, a.end_yn
         </select>
 
         <select id="getHistYearList" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
@@ -120,6 +121,9 @@
         <update id="updateProject" parameterType="com.anything.odoc.project.vo.ProjectMainVO">
             /* ProjectMainDao.updateProject */
             update t_odoc_main set
+                <if test="endYn != null and endYn != ''">
+                    end_yn = #{endYn}
+                </if>
                 <if test="delYn != null and delYn != ''">
                     del_yn = #{delYn}
                 </if>
