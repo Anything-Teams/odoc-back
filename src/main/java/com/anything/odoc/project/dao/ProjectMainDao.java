@@ -2,6 +2,7 @@ package com.anything.odoc.project.dao;
 
 import com.anything.odoc.project.vo.ProjectMainVO;
 import com.anything.odoc.project.vo.ProjectMonthVO;
+import com.anything.odoc.project.vo.ProjectUserVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -28,4 +29,11 @@ public interface ProjectMainDao {
     ProjectMainVO getTempUser(ProjectMainVO projectMainVO);
 
     int updateTempUser(ProjectMainVO projectMainVO);
+
+    int userIdCheck(ProjectUserVO projectUserVO);
+
+    int userRegister(ProjectUserVO projectUserVO);
+
+    ProjectUserVO userLogin(ProjectUserVO projectUserVO);
+
 }

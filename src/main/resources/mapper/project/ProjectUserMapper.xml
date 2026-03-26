@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anything.odoc.project.dao.ProjectMainDao">
+
+    <insert id="userRegister" parameterType="com.anything.odoc.project.vo.ProjectUserVO">
+        /* ProjectMainDao.userRegister */
+        INSERT INTO
+            T_USER (USER_ID
+                   ,USER_PW
+                   ,USER_STATE
+                   ,FRST_REG_DT)
+        VALUES (#{userId}
+               ,#{userPw}
+               ,'N'
+               ,(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+               )
+    </insert>
+
+    <select id="userIdCheck" parameterType="com.anything.odoc.project.vo.ProjectUserVO" resultType="int">
+        /* ProjectMainDao.userIdCheck */
+        SELECT COUNT(*)
+        FROM T_USER
+        WHERE USER_ID = #{userId}
+    </select>
+
+    <select id="userLogin" parameterType="com.anything.odoc.project.vo.ProjectUserVO" resultType="com.anything.odoc.project.vo.ProjectUserVO">
+        /* ProjectMainDao.userLogin */
+        SELECT
+             USER_ID
+             ,USER_PW
+             ,USER_STATE
+             ,FRST_REG_DT
+        FROM T_USER
+        WHERE USER_ID = #{userId}
+          AND USER_STATE = 'Y'
+    </select>
+
+</mapper>

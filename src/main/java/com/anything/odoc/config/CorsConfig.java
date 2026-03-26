@@ -15,6 +15,7 @@ public class CorsConfig implements WebMvcConfigurer {
                     "https://odoc.vercel.app"
                 )
                 .allowedMethods("*")
-                .allowedHeaders("*");
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }
