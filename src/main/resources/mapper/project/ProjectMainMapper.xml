@@ -90,6 +90,10 @@
                 ARRAY_AGG(DISTINCT TO_CHAR(DATE(b.odoc_dt), 'DD')),
                 ','
             ) AS checked_dates
+            , ARRAY_TO_STRING(
+                ARRAY_AGG(to_char(b.odoc_dt, 'HH24시 MI분')),
+                ','
+            ) AS checked_timestamps
             , ROUND(
                 COUNT(DISTINCT DATE(b.odoc_dt))::numeric
                 / EXTRACT(

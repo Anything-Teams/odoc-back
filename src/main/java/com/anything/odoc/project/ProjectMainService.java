@@ -53,11 +53,15 @@ public class ProjectMainService {
         ProjectMonthVO data = projectMainDao.getHistMonth(projectMainVO);
 
         String[] checkedDays = data.getCheckedDates().split(",");
+        String[] checkedTimestamps = data.getCheckedTimestamps().split(",");
+        Map<String, Object> dateTime = new HashMap<>();
+        dateTime.put("checkedDays", checkedDays);
+        dateTime.put("checkedTimestamps", checkedTimestamps);
 
         Map<String, Object> result = new HashMap<>();
         result.put("title", data.getOdocNm());
         result.put("createdDay", data.getCreatedDay());
-        result.put("checkedDays", checkedDays);
+        result.put("dateTime", dateTime);
         result.put("odocRate", data.getProgress());
 
         return result;
