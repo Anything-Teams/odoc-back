@@ -58,7 +58,7 @@ public class ProjectUserController {
     @PostMapping("/userLogout")
     public ResponseEntity<?> logout(HttpSession session) {
         session.invalidate();
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(1);
     }
 
     @PostMapping("/updateAlert")
