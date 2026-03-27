@@ -39,7 +39,8 @@ public class SecurityConfig {
                                 "/updateProject",
                                 "/insertProject",
                                 "/commitProject",
-                                "/updateAlert"
+                                "/updateAlert",
+                                "/userLogout"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
