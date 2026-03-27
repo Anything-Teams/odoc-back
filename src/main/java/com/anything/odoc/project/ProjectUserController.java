@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,8 +45,10 @@ public class ProjectUserController {
             session.setAttribute("loginUser", loginUser);
 
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(loginUser, null, null);
+            SecurityContext context = SecurityContextHolder.getContext();
+            context.setAuthentication(auth);
 
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            session.setAttribute("SPRING_SECURITY_CONTEXT", context);
 
             return ResponseEntity.ok(loginUser);
         }
