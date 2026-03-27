@@ -25,22 +25,11 @@ public class SecurityConfig {
                                 "/userIdCheck",
                                 "/userRegister",
                                 "/healthCheck",
+                                "/sessionUser",
                                 "/test",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**"
-                        ).permitAll()
-                        .requestMatchers(
-                                "/getProjectMainList",
-                                "/getProjectMain",
-                                "/getHistYearList",
-                                "/getHistMonth",
-                                "/getProjectName",
-                                "/updateProject",
-                                "/insertProject",
-                                "/commitProject",
-                                "/updateAlert",
-                                "/userLogout"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

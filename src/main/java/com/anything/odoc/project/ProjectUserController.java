@@ -5,6 +5,8 @@ import com.anything.odoc.project.vo.ProjectUserVO;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,6 +42,11 @@ public class ProjectUserController {
         } else {
             // 세션에 로그인한 사용자 정보를 저장, 세션이름은 loginUser
             session.setAttribute("loginUser", loginUser);
+
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(loginUser, null, null);
+
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
             return ResponseEntity.ok(loginUser);
         }
     }
@@ -58,6 +65,7 @@ public class ProjectUserController {
     @PostMapping("/userLogout")
     public ResponseEntity<?> logout(HttpSession session) {
         session.invalidate();
+        SecurityContextHolder.clearContext();
         return ResponseEntity.ok(1);
     }
 
