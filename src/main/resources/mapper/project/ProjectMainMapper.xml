@@ -7,19 +7,30 @@
     <select id="getProjectMainList" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
         /* ProjectMainDao.getProjectMainList */
         select
-            odoc_sn
-            , user_id
-            , odoc_nm
-            , to_char(frst_reg_dt, 'YYYY. MM. DD') as frst_reg_dt
-            , end_yn
-            , odoc_type
-        from t_odoc_main
-        where user_id = #{userId}
-        and del_yn = 'N'
+            a.odoc_sn
+            , a.user_id
+            , a.odoc_nm
+            , to_char(a.frst_reg_dt, 'YYYY. MM. DD') as frst_reg_dt
+            , a.end_yn
+            , a.odoc_type
+            , CASE
+                WHEN EXISTS (
+                SELECT 1
+                FROM t_odoc_dtl d
+                WHERE d.user_id = a.user_id
+                AND d.odoc_sn = a.odoc_sn
+                AND DATE(d.odoc_dt) = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date
+            )
+            THEN 1
+            ELSE 0
+            END AS odoc_yn
+        from t_odoc_main a
+        where a.user_id = #{userId}
+        and a.del_yn = 'N'
         <if test="odocType != null and odocType != ''">
-            and odoc_type = #{odocType}
+            and a.odoc_type = #{odocType}
         </if>
-        order by case when end_yn = 'N' then 0 else 1 end asc, odoc_sn desc
+        order by case when a.end_yn = 'N' then 0 else 1 end asc, a.odoc_sn desc
     </select>
 
     <select id="getProjectMain" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">

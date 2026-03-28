@@ -11,10 +11,13 @@
             T_USER (USER_ID
                    ,USER_PW
                    ,USER_STATE
-                   ,FRST_REG_DT)
+                   ,FRST_REG_DT
+                   ,LAST_MDF_DT
+        )
         VALUES (#{userId}
                ,#{userPw}
                ,'N'
+               ,(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
                ,(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
                )
     </insert>
