@@ -12,9 +12,13 @@
             , odoc_nm
             , to_char(frst_reg_dt, 'YYYY. MM. DD') as frst_reg_dt
             , end_yn
+            , odoc_type
         from t_odoc_main
         where user_id = #{userId}
         and del_yn = 'N'
+        <if test="odocType != null and odocType != ''">
+            and odoc_type = #{odocType}
+        </if>
         order by case when end_yn = 'N' then 0 else 1 end asc, odoc_sn desc
     </select>
 
@@ -26,6 +30,7 @@
             , a.odoc_nm
             , to_char(a.frst_reg_dt, 'YYYY. MM. DD') as frst_reg_dt
             , a.end_yn
+            , a.odoc_type
             , TO_CHAR((CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date, 'MM') AS odoc_month
             , ROUND(
                     COUNT(DISTINCT DATE(b.odoc_dt))::numeric
@@ -144,12 +149,14 @@
         (
             user_id
             , odoc_nm
+            , odoc_type
             , frst_reg_dt
         )
         values
         (
             #{userId}
             , #{odocNm}
+            , #{odocType}
             , (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
         )
     </insert>
