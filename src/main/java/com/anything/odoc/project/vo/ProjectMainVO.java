@@ -8,6 +8,7 @@ public class ProjectMainVO {
     private String userId;
     private String odocNm;
     private String frstRegDt;
+    private String lastOdocDt;
     private String delYn;
     private String endYn;
     private String odocType;
