@@ -34,6 +34,9 @@
         <if test="odocType != null and odocType != ''">
             and a.odoc_type = #{odocType}
         </if>
+        <if test="endYn != null and endYn != ''">
+            and a.end_yn = #{endYn}
+        </if>
         group by a.odoc_sn, a.user_id, a.odoc_nm, a.frst_reg_dt, a.end_yn, a.odoc_type
         order by case when a.end_yn = 'N' then 0 else 1 end asc, a.odoc_sn desc
     </select>
