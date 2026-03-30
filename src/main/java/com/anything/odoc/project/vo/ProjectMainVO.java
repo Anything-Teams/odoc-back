@@ -13,6 +13,9 @@ public class ProjectMainVO {
     private String endYn;
     private String odocType;
 
+    private String odocFavYn;
+    private String odocThemaType;
+
     private String odocMonth;
     private String progress;
     private int odocYn;

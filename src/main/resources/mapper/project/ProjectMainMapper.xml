@@ -25,6 +25,8 @@
             ELSE 0
             END AS odoc_yn
             , to_char(MAX(b.odoc_dt), 'YYYY. MM. DD') as last_odoc_dt
+            , a.odoc_fav_yn
+            , a.odoc_thema_type
         from t_odoc_main a
         left join t_odoc_dtl b
             on b.odoc_sn = a.odoc_sn
@@ -38,7 +40,7 @@
             and a.end_yn = #{endYn}
         </if>
         group by a.odoc_sn, a.user_id, a.odoc_nm, a.frst_reg_dt, a.end_yn, a.odoc_type
-        order by case when a.end_yn = 'N' then 0 else 1 end asc, a.odoc_sn desc
+        order by case when a.odoc_fav_yn = 'Y' then 0 else 1 end asc, case when a.end_yn = 'N' then 0 else 1 end asc, a.odoc_sn desc
     </select>
 
     <select id="getProjectMain" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
@@ -67,6 +69,8 @@
             THEN 1
             ELSE 0
             END AS odoc_yn
+            , a.odoc_fav_yn
+            , a.odoc_thema_type
         from t_odoc_main a
         left join t_odoc_dtl b
         on a.user_id = b.user_id
@@ -90,6 +94,7 @@
                 )
                 * 100
             , 1) AS progress
+            , a.odoc_thema_type
         from t_odoc_main a
         left join t_odoc_dtl b
         on a.user_id = b.user_id
@@ -98,7 +103,7 @@
         and a.odoc_sn = #{odocSn}
         and b.odoc_dt IS NOT NULL
         group by
-            TO_CHAR(b.odoc_dt, 'YYYY'), TO_CHAR(b.odoc_dt, 'MM'), DATE_TRUNC('month', b.odoc_dt)
+            TO_CHAR(b.odoc_dt, 'YYYY'), TO_CHAR(b.odoc_dt, 'MM'), DATE_TRUNC('month', b.odoc_dt), a.odoc_thema_type
         order by year desc, month desc
     </select>
 
@@ -126,6 +131,7 @@
                 )
                 * 100
             , 1) AS progress
+            , a.odoc_thema_type
         from t_odoc_main a
         left join t_odoc_dtl b
         on a.user_id = b.user_id
@@ -134,7 +140,7 @@
         and b.odoc_dt <![CDATA[ < ]]> DATE_TRUNC('month', TO_DATE(#{year} || '-' || #{month}, 'YYYY-MM')) + INTERVAL '1 month'
         where a.user_id = #{userId}
         and a.odoc_sn = #{odocSn}
-        group by a.odoc_nm, a.frst_reg_dt
+        group by a.odoc_nm, a.frst_reg_dt, a.odoc_thema_type
     </select>
 
     <select id="getProjectName" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
@@ -158,6 +164,9 @@
             <if test="odocNm != null and odocNm != ''">
                 odoc_nm = #{odocNm}
             </if>
+            <if test="odocFavYn != null and odocFavYn != ''">
+                odoc_fav_yn = #{odocFavYn}
+            </if>
         where user_id = #{userId}
         and odoc_sn = #{odocSn}
     </update>
@@ -170,6 +179,7 @@
             , odoc_nm
             , odoc_type
             , frst_reg_dt
+            , odoc_thema_type
         )
         values
         (
@@ -177,6 +187,7 @@
             , #{odocNm}
             , #{odocType}
             , (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+            , #{odocThemaType}
         )
     </insert>
 
