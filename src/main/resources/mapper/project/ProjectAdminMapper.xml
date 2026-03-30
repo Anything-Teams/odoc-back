@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anything.odoc.project.dao.ProjectAdminDao">
+
+    <insert id="insertNotice" parameterType="com.anything.odoc.project.vo.NoticeVO">
+        /* ProjectAdminDao.insertNotice */
+        INSERT INTO T_NOTICE (
+            NOTICE_TITLE
+            , NOTICE_CONTENT
+            , NOTICE_TYPE
+            , NOTICE_YN
+            , FRST_REG_DT
+            , FRST_RGTR_ID
+            , LAST_MDF_DT
+            , LAST_MDFR_ID
+        ) VALUES (
+            #{noticeTitle}
+            , #{noticeContent}
+            , '1'
+            , 'Y'
+            ,(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+            , #{userId}
+            ,(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+            , #{userId}
+        )
+    </insert>
+
+    <select id="selectNotice" parameterType="com.anything.odoc.project.vo.NoticeVO" resultType="com.anything.odoc.project.vo.NoticeVO">
+        /* ProjectAdminDao.selectNotice */
+        SELECT
+            NOTICE_SN
+            , NOTICE_TITLE
+            , NOTICE_CONTENT
+            , NOTICE_YN
+        FROM T_NOTICE
+        WHERE DEL_YN = 'N'
+        AND NOTICE_SN = #{noticeSn}::integer
+        <if test="noticeYn != null and noticeYn != ''">
+            AND NOTICE_YN = #{noticeYn}
+        </if>
+    </select>
+
+    <update id="updateNotice" parameterType="com.anything.odoc.project.vo.NoticeVO">
+        /* ProjectAdminDao.updateNotice */
+        update T_NOTICE set
+            NOTICE_CONTENT = #{noticeContent}
+          , NOTICE_YN = #{noticeYn}
+          , LAST_MDF_DT = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+          , LAST_MDFR_ID = #{userId}
+        where NOTICE_SN = #{noticeSn}::integer
+    </update>
+
+</mapper>
