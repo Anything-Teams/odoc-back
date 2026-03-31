@@ -53,4 +53,34 @@
         where NOTICE_SN = #{noticeSn}::integer
     </update>
 
+    <select id="userList" parameterType="com.anything.odoc.project.vo.ProjectUserVO" resultType="com.anything.odoc.project.vo.ProjectUserVO">
+        /* ProjectAdminDao.userList */
+        SELECT
+            USER_ID
+            , USER_PW
+            , USER_STATE
+            , ADMIN_YN
+            , FRST_REG_DT
+        FROM T_USER
+        order by case when ADMIN_YN = 'Y' then 0 else 1 end asc, FRST_REG_DT desc
+    </select>
+
+    <update id="updateUser" parameterType="com.anything.odoc.project.vo.ProjectUserVO">
+        /* ProjectAdminDao.updateUser */
+        update T_USER set
+            LAST_MDF_DT = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+            <if test="adminYn != null and adminYn != ''">
+                , ADMIN_YN = #{adminYn}
+            </if>
+            <if test="userState != null and userState != ''">
+                , USER_STATE = #{userState}
+            </if>
+        where USER_ID = #{userId}
+    </update>
+
+    <update id="deleteUser" parameterType="com.anything.odoc.project.vo.ProjectUserVO">
+        /* ProjectAdminDao.deleteUser */
+        DELETE T_USER
+        where USER_ID = #{userId}
+    </update>
 </mapper>

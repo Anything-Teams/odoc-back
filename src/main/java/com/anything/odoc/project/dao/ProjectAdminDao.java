@@ -1,7 +1,10 @@
 package com.anything.odoc.project.dao;
 
 import com.anything.odoc.project.vo.NoticeVO;
+import com.anything.odoc.project.vo.ProjectUserVO;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 @Mapper
 public interface ProjectAdminDao {
@@ -12,4 +15,9 @@ public interface ProjectAdminDao {
 
     NoticeVO selectNotice(NoticeVO noticeVO);
 
+    List<ProjectUserVO> userList(ProjectUserVO projectUserVO);
+
+    int updateUser(ProjectUserVO projectUserVO);
+
+    int deleteUser(ProjectUserVO projectUserVO);
 }
