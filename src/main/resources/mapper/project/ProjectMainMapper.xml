@@ -40,7 +40,7 @@
             and a.end_yn = #{endYn}
         </if>
         group by a.odoc_sn, a.user_id, a.odoc_nm, a.frst_reg_dt, a.end_yn, a.odoc_type
-        order by case when a.odoc_fav_yn = 'Y' then 0 else 1 end asc, case when a.end_yn = 'N' then 0 else 1 end asc, a.odoc_sn desc
+        order by case when a.end_yn = 'N' then 0 else 1 end asc, case when a.odoc_fav_yn = 'Y' then 0 else 1 end asc, a.odoc_sn desc
     </select>
 
     <select id="getProjectMain" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
