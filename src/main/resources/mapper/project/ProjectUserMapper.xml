@@ -38,6 +38,7 @@
 --              ,FRST_REG_DT
              , IS_MOTIVATION_ALERT
              , ADMIN_YN
+             , MAX_STREAM_SN
         FROM T_USER
         WHERE USER_ID = #{userId}
           AND USER_STATE = 'Y'

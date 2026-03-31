@@ -11,4 +11,5 @@ public class ProjectUserVO {
     private String adminYn;      /* 관리자여부 */
     private String frstRegDt;   /* 최초등록일시 */
     private String lastMdrDt;   /* 최종등록일시 */
+    private String maxStreamSn;   /* 최대일수 */
 }

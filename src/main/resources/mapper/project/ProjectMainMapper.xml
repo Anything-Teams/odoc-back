@@ -27,6 +27,14 @@
             , to_char(MAX(b.odoc_dt), 'YYYY. MM. DD') as last_odoc_dt
             , a.odoc_fav_yn
             , a.odoc_thema_type
+            , CASE
+                WHEN a.stream_mdf_dt is not null
+                AND a.stream_mdf_dt between (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date - 1
+                    AND (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+                THEN a.stream_sn
+                ELSE 0
+                END as stream_sn
+            , a.max_stream_sn
         from t_odoc_main a
         left join t_odoc_dtl b
             on b.odoc_sn = a.odoc_sn
@@ -63,14 +71,23 @@
                     SELECT 1
                     FROM t_odoc_dtl d
                     WHERE d.user_id = a.user_id
-                      AND d.odoc_sn = a.odoc_sn
-                      AND DATE(d.odoc_dt) = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date
+                        AND d.odoc_sn = a.odoc_sn
+                        AND d.odoc_dt <![CDATA[ >= ]]> (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date
+                        AND d.odoc_dt <![CDATA[ < ]]>  (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date + interval '1 day'
                 )
             THEN 1
             ELSE 0
             END AS odoc_yn
             , a.odoc_fav_yn
             , a.odoc_thema_type
+            , CASE
+                  WHEN a.stream_mdf_dt is not null
+                      AND a.stream_mdf_dt between (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date - 1
+                      AND (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+                      THEN a.stream_sn
+                  ELSE 0
+            END as stream_sn
+            , a.max_stream_sn
         from t_odoc_main a
         left join t_odoc_dtl b
         on a.user_id = b.user_id
@@ -200,12 +217,69 @@
             , odoc_dt
             , frst_reg_dt
         )
-        values
-        (
+        select
             #{odocSn}
             , #{userId}
             , (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
             , (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+        where not exists (
+            select 1
+            from t_odoc_dtl d
+            where d.odoc_sn = #{odocSn}
+            AND d.user_id = #{userId}
+            AND d.odoc_dt <![CDATA[ >= ]]> (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date
+            AND d.odoc_dt <![CDATA[ < ]]>  (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date + interval '1 day'
         )
     </insert>
+
+
+    <update id="updateStream" parameterType="com.anything.odoc.project.vo.ProjectMainVO">
+        WITH prev AS (
+            SELECT EXISTS (
+                SELECT 1
+                FROM t_odoc_dtl d
+                WHERE d.user_id = #{userId}
+                AND d.odoc_sn = #{odocSn}
+                AND d.odoc_dt <![CDATA[ >= ]]> (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date - interval '1 day'
+                AND d.odoc_dt <![CDATA[ < ]]> (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date
+            ) AS has_prev
+        )
+        UPDATE t_odoc_main m
+        SET
+            stream_sn =
+                CASE WHEN prev.has_prev
+                THEN COALESCE(m.stream_sn,0)+1
+                ELSE 1
+                END
+            , max_stream_sn = GREATEST(
+                COALESCE(m.max_stream_sn, 0),
+                CASE WHEN prev.has_prev
+                THEN COALESCE(m.stream_sn,0)+1
+                ELSE 1
+                END
+            )
+            , stream_mdf_dt = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+        FROM prev
+        WHERE m.user_id = #{userId}
+        AND m.odoc_sn = #{odocSn}
+    </update>
+
+    <update id="updateUserStreamMax" parameterType="com.anything.odoc.project.vo.ProjectMainVO">
+        UPDATE T_USER u
+        SET
+            max_stream_sn = GREATEST(
+                    COALESCE(u.max_stream_sn, 0),
+                    COALESCE(m.max_stream_sn, 0)
+                            ),
+            LAST_MDF_DT = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+        FROM (
+            SELECT
+                user_id
+                , MAX(max_stream_sn) AS max_stream_sn
+            FROM t_odoc_main
+            WHERE user_id = #{userId}
+            GROUP BY user_id
+        ) m
+        WHERE u.user_id = m.user_id
+    </update>
 </mapper>

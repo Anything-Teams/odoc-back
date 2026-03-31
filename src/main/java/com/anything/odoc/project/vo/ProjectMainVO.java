@@ -22,4 +22,7 @@ public class ProjectMainVO {
 
     private String year;
     private String month;
+
+    private int streamSn;
+    private int maxStreamSn;
 }

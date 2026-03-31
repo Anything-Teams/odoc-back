@@ -4,7 +4,9 @@ import com.anything.odoc.project.dao.ProjectMainDao;
 import com.anything.odoc.project.vo.ProjectMainVO;
 import com.anything.odoc.project.vo.ProjectMonthVO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.beans.Transient;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -80,7 +82,15 @@ public class ProjectMainService {
         return projectMainDao.insertProject(projectMainVO);
     }
 
+    @Transactional
     public int commitProject(ProjectMainVO projectMainVO) {
-        return projectMainDao.commitProject(projectMainVO);
+        int result = projectMainDao.commitProject(projectMainVO);
+
+        if(result > 0) {
+            projectMainDao.updateStream(projectMainVO);
+            projectMainDao.updateUserStreamMax(projectMainVO);
+        }
+
+        return result;
     }
 }

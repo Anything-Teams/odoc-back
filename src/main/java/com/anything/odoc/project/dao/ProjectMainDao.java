@@ -26,6 +26,10 @@ public interface ProjectMainDao {
 
     int commitProject(ProjectMainVO projectMainVO);
 
+    int updateStream(ProjectMainVO projectMainVO);
+
+    int updateUserStreamMax(ProjectMainVO projectMainVO);
+
     int updateAlert(ProjectUserVO projectUserVO);
 
     int userIdCheck(ProjectUserVO projectUserVO);
