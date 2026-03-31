@@ -25,4 +25,5 @@ public class ProjectMainVO {
 
     private int streamSn;
     private int maxStreamSn;
+    private int themaId;
 }

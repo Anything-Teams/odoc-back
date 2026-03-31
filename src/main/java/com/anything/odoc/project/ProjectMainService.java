@@ -93,4 +93,14 @@ public class ProjectMainService {
 
         return result;
     }
+
+    public ProjectMainVO selectUserThema(ProjectMainVO projectMainVO) {
+        ProjectMainVO result = projectMainDao.selectUserThema(projectMainVO);
+        return result != null ? result : new ProjectMainVO();
+    }
+
+    public int insertUserThema(ProjectMainVO projectMainVO) {
+        return projectMainDao.insertUserThema(projectMainVO);
+    }
+
 }

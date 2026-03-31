@@ -38,4 +38,7 @@ public interface ProjectMainDao {
 
     ProjectUserVO userLogin(ProjectUserVO projectUserVO);
 
+    ProjectMainVO selectUserThema(ProjectMainVO projectMainVO);
+
+    int insertUserThema(ProjectMainVO projectMainVO);
 }

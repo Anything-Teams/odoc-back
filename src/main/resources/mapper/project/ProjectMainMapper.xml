@@ -169,6 +169,14 @@
         and odoc_sn = #{odocSn}
     </select>
 
+    <select id="selectUserThema" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
+        /* ProjectMainDao.selectUserThema */
+        select
+            max(thema_id) as thema_id
+        from t_thema_dtl
+        where user_id = #{userId}
+    </select>
+
     <update id="updateProject" parameterType="com.anything.odoc.project.vo.ProjectMainVO">
         /* ProjectMainDao.updateProject */
         update t_odoc_main set
@@ -282,4 +290,18 @@
         ) m
         WHERE u.user_id = m.user_id
     </update>
+
+    <insert id="insertUserThema" parameterType="com.anything.odoc.project.vo.ProjectMainVO">
+        /* ProjectMainDao.insertUserThema */
+        insert into t_thema_dtl
+        (
+            thema_id
+            , user_id
+        )
+        values
+        (
+            #{themaId}
+            , #{userId}
+        )
+    </insert>
 </mapper>

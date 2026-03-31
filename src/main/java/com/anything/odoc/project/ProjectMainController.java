@@ -72,6 +72,21 @@ public class ProjectMainController {
         }
     }
 
+    @PostMapping("/selectUserThema")
+    public ProjectMainVO selectUserThema(@RequestBody ProjectMainVO projectMainVO) {
+        return projectMainService.selectUserThema(projectMainVO);
+    }
+
+    @PostMapping("/insertUserThema")
+    public ResponseEntity<Integer> insertUserThema(@RequestBody ProjectMainVO projectMainVO) {
+        int result = projectMainService.insertUserThema(projectMainVO);
+        if (result > 0) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping("/healthCheck")
     public String healthCheck() {
         return "ok";
