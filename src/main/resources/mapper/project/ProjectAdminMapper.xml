@@ -80,7 +80,7 @@
 
     <update id="deleteUser" parameterType="com.anything.odoc.project.vo.ProjectUserVO">
         /* ProjectAdminDao.deleteUser */
-        DELETE T_USER
+        DELETE FROM T_USER
         where USER_ID = #{userId}
     </update>
 </mapper>
