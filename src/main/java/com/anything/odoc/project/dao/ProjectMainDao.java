@@ -3,6 +3,7 @@ package com.anything.odoc.project.dao;
 import com.anything.odoc.project.vo.ProjectMainVO;
 import com.anything.odoc.project.vo.ProjectMonthVO;
 import com.anything.odoc.project.vo.ProjectUserVO;
+import com.anything.odoc.project.vo.ThemaVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -38,7 +39,9 @@ public interface ProjectMainDao {
 
     ProjectUserVO userLogin(ProjectUserVO projectUserVO);
 
-    ProjectMainVO selectUserThema(ProjectMainVO projectMainVO);
+    List<ProjectMainVO> selectUserThemaList(ProjectMainVO projectMainVO);
 
     int insertUserThema(ProjectMainVO projectMainVO);
+
+    List<ThemaVO> selectThemaList(ThemaVO themaVO);
 }

@@ -3,8 +3,10 @@ package com.anything.odoc.project;
 import com.anything.odoc.project.dao.ProjectMainDao;
 import com.anything.odoc.project.vo.ProjectMainVO;
 import com.anything.odoc.project.vo.ProjectMonthVO;
+import com.anything.odoc.project.vo.ThemaVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.beans.Transient;
 import java.time.LocalDate;
@@ -94,13 +96,39 @@ public class ProjectMainService {
         return result;
     }
 
-    public ProjectMainVO selectUserThema(ProjectMainVO projectMainVO) {
-        ProjectMainVO result = projectMainDao.selectUserThema(projectMainVO);
-        return result != null ? result : new ProjectMainVO();
+    public List<ProjectMainVO> selectUserThemaList(ProjectMainVO projectMainVO) {
+        List<ProjectMainVO> result = projectMainDao.selectUserThemaList(projectMainVO);
+        return result != null ? result : new ArrayList<>();
     }
 
     public int insertUserThema(ProjectMainVO projectMainVO) {
         return projectMainDao.insertUserThema(projectMainVO);
     }
 
+    public List<ThemaVO> selectThemaList(ThemaVO themaVO) {
+        return projectMainDao.selectThemaList(themaVO);
+    }
+
+    public String codeRegist(ThemaVO themaVO) {
+        String result = "";
+
+        List<ThemaVO> codeThema = projectMainDao.selectThemaList(themaVO);
+
+        if(!codeThema.isEmpty()) {
+            ProjectMainVO projectMainVO = new ProjectMainVO();
+            projectMainVO.setUserId(themaVO.getUserId());
+            projectMainVO.setThemaId(codeThema.getFirst().getThemaId());
+
+            if(projectMainDao.selectUserThemaList(projectMainVO).isEmpty()) {
+                projectMainDao.insertUserThema(projectMainVO);
+
+                result = "[" + codeThema.getFirst().getThemaNm() + "] 를 받았습니다!";
+            } else {
+                result = "이미 등록이 된 코드입니다";
+            }
+        } else {
+            result = "해당 코드는 없는 코드입니다";
+        }
+        return result;
+    }
 }

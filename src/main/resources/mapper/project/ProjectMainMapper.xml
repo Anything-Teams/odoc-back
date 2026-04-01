@@ -169,14 +169,6 @@
         and odoc_sn = #{odocSn}
     </select>
 
-    <select id="selectUserThema" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
-        /* ProjectMainDao.selectUserThema */
-        select
-            max(thema_id) as thema_id
-        from t_thema_dtl
-        where user_id = #{userId}
-    </select>
-
     <update id="updateProject" parameterType="com.anything.odoc.project.vo.ProjectMainVO">
         /* ProjectMainDao.updateProject */
         update t_odoc_main set
@@ -290,6 +282,33 @@
         ) m
         WHERE u.user_id = m.user_id
     </update>
+
+    <select id="selectThemaList" parameterType="com.anything.odoc.project.vo.ThemaVO" resultType="com.anything.odoc.project.vo.ThemaVO">
+        /* ProjectMainDao.selectThemaList */
+        select
+            thema_id
+            , thema_nm
+            , thema_get_method
+            , coalesce(thema_get_day, 0) as thema_get_day
+            , coalesce(thema_get_cd, '') as thema_get_cd
+        from t_thema_main
+        where use_yn = 'Y'
+        <if test="themaGetCd != null and themaGetCd != ''">
+            and thema_get_method = 'code'
+            and thema_get_cd = #{themaGetCd}
+        </if>
+    </select>
+
+    <select id="selectUserThemaList" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
+        /* ProjectMainDao.selectUserThemaList */
+        select
+            thema_id
+        from t_thema_dtl
+        where user_id = #{userId}
+        <if test="themaId != null and themaId != ''">
+            and thema_id = #{themaId}::text
+        </if>
+    </select>
 
     <insert id="insertUserThema" parameterType="com.anything.odoc.project.vo.ProjectMainVO">
         /* ProjectMainDao.insertUserThema */

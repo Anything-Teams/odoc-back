@@ -1,6 +1,7 @@
 package com.anything.odoc.project;
 
 import com.anything.odoc.project.vo.ProjectMainVO;
+import com.anything.odoc.project.vo.ThemaVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -72,9 +74,9 @@ public class ProjectMainController {
         }
     }
 
-    @PostMapping("/selectUserThema")
-    public ProjectMainVO selectUserThema(@RequestBody ProjectMainVO projectMainVO) {
-        return projectMainService.selectUserThema(projectMainVO);
+    @PostMapping("/selectUserThemaList")
+    public List<ProjectMainVO> selectUserThemaList(@RequestBody ProjectMainVO projectMainVO) {
+        return projectMainService.selectUserThemaList(projectMainVO);
     }
 
     @PostMapping("/insertUserThema")
@@ -85,6 +87,17 @@ public class ProjectMainController {
         } else {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @PostMapping("/selectThemaList")
+    public List<ThemaVO> selectThemaList(@RequestBody ThemaVO themaVO) {
+        return projectMainService.selectThemaList(themaVO);
+    }
+
+    @PostMapping("/codeRegist")
+    public ResponseEntity<Map<String, String>> codeRegist(@RequestBody ThemaVO themaVO) {
+        String result = projectMainService.codeRegist(themaVO);
+        return ResponseEntity.ok(Collections.singletonMap("result", result));
     }
 
     @GetMapping("/healthCheck")
