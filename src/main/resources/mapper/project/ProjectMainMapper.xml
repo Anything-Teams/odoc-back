@@ -149,6 +149,7 @@
                 * 100
             , 1) AS progress
             , a.odoc_thema_type
+            , a.odoc_type
         from t_odoc_main a
         left join t_odoc_dtl b
         on a.user_id = b.user_id
@@ -157,7 +158,7 @@
         and b.odoc_dt <![CDATA[ < ]]> DATE_TRUNC('month', TO_DATE(#{year} || '-' || #{month}, 'YYYY-MM')) + INTERVAL '1 month'
         where a.user_id = #{userId}
         and a.odoc_sn = #{odocSn}
-        group by a.odoc_nm, a.frst_reg_dt, a.odoc_thema_type
+        group by a.odoc_nm, a.frst_reg_dt, a.odoc_thema_type, a.odoc_type
     </select>
 
     <select id="getProjectName" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">

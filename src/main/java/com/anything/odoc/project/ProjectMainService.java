@@ -68,6 +68,7 @@ public class ProjectMainService {
         result.put("dateTime", dateTime);
         result.put("odocRate", data.getProgress());
         result.put("odocThemaType", data.getOdocThemaType());
+        result.put("odocType", data.getOdocType());
 
         return result;
     }

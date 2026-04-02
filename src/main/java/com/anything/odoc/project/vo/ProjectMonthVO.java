@@ -10,4 +10,5 @@ public class ProjectMonthVO {
     private String checkedTimestamps;
     private double progress;
     private double odocThemaType;
+    private String odocType;
 }
