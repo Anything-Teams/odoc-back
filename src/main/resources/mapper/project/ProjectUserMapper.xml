@@ -10,13 +10,15 @@
         INSERT INTO
             T_USER (USER_ID
                    ,USER_PW
+                    , NICK_NM
                    ,USER_STATE
                    ,FRST_REG_DT
                    ,LAST_MDF_DT
         )
         VALUES (#{userId}
                ,#{userPw}
-               ,'N'
+                , #{nickNm}
+               ,'Y'
                ,(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
                ,(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
                )

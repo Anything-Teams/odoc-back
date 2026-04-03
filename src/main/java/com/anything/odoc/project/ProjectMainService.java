@@ -119,6 +119,7 @@ public class ProjectMainService {
             ProjectMainVO projectMainVO = new ProjectMainVO();
             projectMainVO.setUserId(themaVO.getUserId());
             projectMainVO.setThemaId(codeThema.getFirst().getThemaId());
+            projectMainVO.setThemaConfirmYn("Y");
 
             if(projectMainDao.selectUserThemaList(projectMainVO).isEmpty()) {
                 projectMainDao.insertUserThema(projectMainVO);

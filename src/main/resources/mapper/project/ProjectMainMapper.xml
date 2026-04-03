@@ -298,12 +298,26 @@
             and thema_get_method = 'code'
             and thema_get_cd = #{themaGetCd}
         </if>
+        order by
+            case when thema_get_method = 'free' then 0
+                when thema_get_method = 'day' then 1
+                else 2 end asc, thema_id asc
     </select>
 
     <select id="selectUserThemaList" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
         /* ProjectMainDao.selectUserThemaList */
+        <if test="themaConfirmYn == null or themaConfirmYn == ''">
+            SELECT
+                thema_id
+            FROM t_thema_main
+            WHERE use_yn = 'Y'
+            AND thema_get_method = 'free'
+
+            UNION
+        </if>
+
         select
-            thema_id
+            thema_id::integer
         from t_thema_dtl
         where user_id = #{userId}
         <if test="themaId != null and themaId != ''">

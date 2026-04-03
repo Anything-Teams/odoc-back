@@ -12,4 +12,5 @@ public class ProjectUserVO {
     private String frstRegDt;   /* 최초등록일시 */
     private String lastMdrDt;   /* 최종등록일시 */
     private String maxStreamSn;   /* 최대일수 */
+    private String nickNm;    /* 닉네임 */
 }
