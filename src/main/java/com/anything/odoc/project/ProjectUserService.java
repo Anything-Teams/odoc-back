@@ -23,20 +23,7 @@ public class ProjectUserService {
 
     public int userRegister(ProjectUserVO projectUserVO) {
         projectUserVO.setUserPw(passwordEncoder.encode(projectUserVO.getUserPw()));
-        int result = projectMainDao.userRegister(projectUserVO);
-
-        if(result > 0) {
-            ProjectMainVO projectMainVO = new ProjectMainVO();
-            projectMainVO.setUserId(projectUserVO.getUserId());
-
-            List<Integer> defaultThemaIds = Arrays.asList(0, 1);
-
-            for (Integer themaId : defaultThemaIds) {
-                projectMainVO.setThemaId(themaId);
-                projectMainDao.insertUserThema(projectMainVO);
-            }
-        }
-        return result;
+        return projectMainDao.userRegister(projectUserVO);
     }
 
     public int userIdCheck(ProjectUserVO projectUserVO) {
