@@ -20,7 +20,7 @@ public class PushScheduler {
     private final PushDao pushDao;
     private final FcmSendService fcmSendService;
 
-    @Scheduled(cron = "0 * * * * *")
+//    @Scheduled(cron = "0 * * * * *")
     public void sendOdocReminder() {
         String nowHm = LocalTime.now(ZoneId.of("Asia/Seoul"))
                 .format(DateTimeFormatter.ofPattern("HH:mm"));
@@ -36,15 +36,7 @@ public class PushScheduler {
             try {
                 String title = "ODOC";
                 String body = "[" + target.getOdocNames() + "] 시간입니다";
-                String link;
-
-                String frontUrl = "https://odoc.vercel.app/";
-
-                if (target.getOdocNames().split(",").length == 1) {
-                    link = frontUrl + "projects/" + target.getOdocSn();
-                } else {
-                    link = frontUrl + "projects";
-                }
+                String link = "https://odoc.vercel.app/";
 
                 String response = fcmSendService.sendToToken(
                         target.getPushToken(),
