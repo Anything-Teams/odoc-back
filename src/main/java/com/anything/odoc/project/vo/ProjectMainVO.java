@@ -28,4 +28,6 @@ public class ProjectMainVO {
     private int themaId;
 
     private String themaConfirmYn;
+    private String odocAlarmYn;
+    private String odocAlarmTime;
 }

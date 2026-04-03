@@ -27,6 +27,8 @@ public class SecurityConfig {
                                 "/healthCheck",
                                 "/sessionUser",
                                 "/test",
+                                "/testAccessToken",
+                                "/testPush",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**"

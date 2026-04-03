@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anything.odoc.push.dao.PushDao">
+    <insert id="insertPushToken" parameterType="com.anything.odoc.push.vo.PushTokenVO">
+        INSERT INTO t_user_push_token (
+            user_id
+            , push_token
+            , use_yn
+            , allow_yn
+            , device_type
+            , browser_name
+            , platform
+            , user_agent
+            , device_name
+            , frst_reg_dt
+            , last_mdf_dt
+            , last_seen_dt
+        ) VALUES (
+            #{userId}
+            , #{pushToken}
+            , 'Y'
+            , 'Y'
+            , #{deviceType}
+            , #{browserName}
+            , #{platform}
+            , #{userAgent}
+            , #{deviceName}
+            , (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+            , (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+            , (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+        )
+        ON CONFLICT (user_id, push_token)
+        DO UPDATE SET
+        use_yn = 'Y',
+        allow_yn = 'Y',
+        device_type = #{deviceType},
+        browser_name = #{browserName},
+        platform = #{platform},
+        user_agent = #{userAgent},
+        device_name = #{deviceName},
+        last_mdf_dt = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul'),
+        last_seen_dt = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+    </insert>
+
+    <select id="selectPushTargets" parameterType="string" resultType="com.anything.odoc.push.vo.PushTargetVO">
+        SELECT
+            a.user_id,
+            t.push_token,
+            COUNT(*) AS odoc_cnt,
+            MIN(a.odoc_sn) AS odoc_sn,
+            STRING_AGG(a.odoc_nm, ', ' ORDER BY a.odoc_nm) AS odoc_names
+        FROM t_odoc_main a
+        JOIN t_user_push_token t
+        ON a.user_id = t.user_id
+        AND t.use_yn = 'Y'
+        AND t.allow_yn = 'Y'
+        WHERE a.odoc_alarm_yn = 'Y'
+        AND TO_CHAR(a.odoc_alarm_time, 'HH24:MI') = #{nowHm}
+        AND NOT EXISTS (
+            SELECT 1
+            FROM t_odoc_dtl d
+            WHERE d.user_id = a.user_id
+            AND d.odoc_sn = a.odoc_sn
+            AND DATE(d.odoc_dt) = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date
+        )
+        GROUP BY a.user_id, t.push_token
+    </select>
+
+    <select id="selectPushTokens" parameterType="string" resultType="string">
+        SELECT push_token
+        FROM t_user_push_token
+        WHERE user_id = #{userId}
+          AND use_yn = 'Y'
+    </select>
+</mapper>
