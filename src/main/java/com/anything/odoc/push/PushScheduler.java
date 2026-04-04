@@ -20,7 +20,7 @@ public class PushScheduler {
     private final PushDao pushDao;
     private final FcmSendService fcmSendService;
 
-    @Scheduled(cron = "0 * * * * *")
+//    @Scheduled(cron = "0 * * * * *")
     public void sendOdocReminder() {
         String nowHm = LocalTime.now(ZoneId.of("Asia/Seoul"))
                 .format(DateTimeFormatter.ofPattern("HH:mm"));
