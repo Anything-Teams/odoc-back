@@ -39,7 +39,7 @@ public class ProjectAdminController {
     }
 
     @PostMapping("/userList")
-    public List<ProjectUserVO> userList(ProjectUserVO projectUserVO) {
+    public List<ProjectUserVO> userList(@RequestBody ProjectUserVO projectUserVO) {
         return projectAdminService.userList(projectUserVO);
     }
 

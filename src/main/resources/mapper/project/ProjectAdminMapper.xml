@@ -37,7 +37,7 @@
             , NOTICE_YN
         FROM T_NOTICE
         WHERE DEL_YN = 'N'
-        AND NOTICE_SN = #{noticeSn}::integer
+            AND notice_type = #{noticeType}
         <if test="noticeYn != null and noticeYn != ''">
             AND NOTICE_YN = #{noticeYn}
         </if>
@@ -57,12 +57,12 @@
         /* ProjectAdminDao.userList */
         SELECT
             USER_ID
-            , USER_PW
             , USER_STATE
             , ADMIN_YN
             , FRST_REG_DT
         FROM T_USER
         order by case when ADMIN_YN = 'Y' then 0 else 1 end asc, FRST_REG_DT desc
+        LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
     <update id="updateUser" parameterType="com.anything.odoc.project.vo.ProjectUserVO">
