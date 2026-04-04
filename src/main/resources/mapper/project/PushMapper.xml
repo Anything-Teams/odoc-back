@@ -58,6 +58,7 @@
         AND t.use_yn = 'Y'
         AND t.allow_yn = 'Y'
         WHERE a.odoc_alarm_yn = 'Y'
+        AND a.del_yn = 'N'
         AND TO_CHAR(a.odoc_alarm_time, 'HH24:MI') = #{nowHm}
         AND NOT EXISTS (
             SELECT 1
