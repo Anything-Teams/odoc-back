@@ -307,6 +307,7 @@
             , thema_get_method
             , coalesce(thema_get_day, 0) as thema_get_day
             , coalesce(thema_get_cd, '') as thema_get_cd
+            , thema_desc
         from t_thema_main
         where use_yn = 'Y'
         <if test="themaGetCd != null and themaGetCd != ''">
