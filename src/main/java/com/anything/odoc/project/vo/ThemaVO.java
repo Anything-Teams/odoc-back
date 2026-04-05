@@ -10,4 +10,5 @@ public class ThemaVO {
     private String themaGetMethod;
     private int themaGetDay;
     private String themaGetCd;
+    private String themaDesc;
 }

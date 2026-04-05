@@ -41,6 +41,9 @@
         <if test="noticeYn != null and noticeYn != ''">
             AND NOTICE_YN = #{noticeYn}
         </if>
+        <if test="noticeSn != null and noticeSn != ''">
+            AND NOTICE_SN = #{noticeSn}::integer
+        </if>
     </select>
 
     <update id="updateNotice" parameterType="com.anything.odoc.project.vo.NoticeVO">
