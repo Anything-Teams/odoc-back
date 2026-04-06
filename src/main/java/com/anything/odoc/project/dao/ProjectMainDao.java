@@ -44,4 +44,6 @@ public interface ProjectMainDao {
     int insertUserThema(ProjectMainVO projectMainVO);
 
     List<ThemaVO> selectThemaList(ThemaVO themaVO);
+
+    int updateMemo(ProjectMainVO projectMainVO);
 }

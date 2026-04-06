@@ -58,6 +58,9 @@ public class ProjectMainService {
 
         String[] checkedDays = data.getCheckedDates().split(",");
         String[] checkedTimestamps = data.getCheckedTimestamps().split(",");
+        String[] memos = (data.getCheckedMemos() != null && !data.getCheckedMemos().isEmpty())
+                ? data.getCheckedMemos().split(",")
+                : new String[0];
         Map<String, Object> dateTime = new HashMap<>();
         dateTime.put("checkedDays", checkedDays);
         dateTime.put("checkedTimestamps", checkedTimestamps);
@@ -66,6 +69,7 @@ public class ProjectMainService {
         result.put("title", data.getOdocNm());
         result.put("createdDay", data.getCreatedDay());
         result.put("dateTime", dateTime);
+        result.put("memos", memos);
         result.put("odocRate", data.getProgress());
         result.put("odocThemaType", data.getOdocThemaType());
         result.put("odocType", data.getOdocType());
@@ -132,5 +136,9 @@ public class ProjectMainService {
             result = "해당 코드는 없는 코드입니다";
         }
         return result;
+    }
+    
+    public int updateMemo(ProjectMainVO projectMainVO) {
+        return projectMainDao.updateMemo(projectMainVO);
     }
 }
