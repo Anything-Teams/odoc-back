@@ -8,6 +8,7 @@ public class ProjectMonthVO {
     private int createdDay;
     private String checkedDates;
     private String checkedTimestamps;
+    private String checkedMemos;
     private double progress;
     private double odocThemaType;
     private String odocType;

@@ -30,4 +30,7 @@ public class ProjectMainVO {
     private String themaConfirmYn;
     private String odocAlarmYn;
     private String odocAlarmTime;
+
+    private String odocMemo;
+    private int odocDaySn;
 }

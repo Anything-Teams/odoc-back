@@ -53,52 +53,78 @@
 
     <select id="getProjectMain" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
         /* ProjectMainDao.getProjectMain */
-        select
-            a.odoc_sn
-            , a.user_id
-            , a.odoc_nm
-            , to_char(a.frst_reg_dt, 'YYYY. MM. DD') as frst_reg_dt
-            , a.end_yn
-            , a.odoc_type
-            , TO_CHAR((CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date, 'MM') AS odoc_month
-            , ROUND(
-                    COUNT(DISTINCT DATE(b.odoc_dt))::numeric
-                    / EXTRACT(DAY FROM DATE_TRUNC('month', (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date) + INTERVAL '1 month - 1 day')
-                    * 100
-              , 1) AS progress
-            , CASE
-                WHEN EXISTS (
-                    SELECT 1
-                    FROM t_odoc_dtl d
-                    WHERE d.user_id = a.user_id
-                        AND d.odoc_sn = a.odoc_sn
-                        AND d.odoc_dt <![CDATA[ >= ]]> (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date
-                        AND d.odoc_dt <![CDATA[ < ]]>  (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date + interval '1 day'
-                )
-            THEN 1
-            ELSE 0
-            END AS odoc_yn
-            , a.odoc_fav_yn
-            , a.odoc_thema_type
-            , CASE
-                  WHEN a.stream_mdf_dt is not null
-                      AND a.stream_mdf_dt between (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date - 1
-                      AND (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
-                      THEN a.stream_sn
-                  ELSE 0
-            END as stream_sn
-            , a.max_stream_sn
-            , COALESCE(to_char(a.odoc_alarm_time, 'HH24:MI'), '00:00') as odoc_alarm_time
-            , a.odoc_alarm_yn
-        from t_odoc_main a
-        left join t_odoc_dtl b
-        on a.user_id = b.user_id
-        and a.odoc_sn = b.odoc_sn
-        and b.odoc_dt <![CDATA[ >= ]]> DATE_TRUNC('month', (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date)
-        and b.odoc_dt <![CDATA[ < ]]> DATE_TRUNC('month', (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date) + INTERVAL '1 month'
-        where a.user_id = #{userId}
-        and a.odoc_sn = #{odocSn}
-        group by a.odoc_sn, a.user_id, a.odoc_nm, a.frst_reg_dt, a.end_yn
+        WITH base_time AS (
+            SELECT
+                (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul') AS now_kr,
+                (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date AS today_kr,
+                DATE_TRUNC('month', (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date) AS month_start,
+                DATE_TRUNC('month', (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date) + INTERVAL '1 month' AS next_month_start,
+            EXTRACT(
+            DAY FROM DATE_TRUNC('month', (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date)
+            + INTERVAL '1 month - 1 day'
+            ) AS month_last_day
+            ),
+            month_stat AS (
+        SELECT
+            b.user_id,
+            b.odoc_sn,
+            COUNT(DISTINCT DATE(b.odoc_dt)) AS checked_day_count
+        FROM t_odoc_dtl b
+            CROSS JOIN base_time bt
+        WHERE b.odoc_dt <![CDATA[ >= ]]> bt.month_start
+          AND b.odoc_dt <![CDATA[ < ]]> bt.next_month_start
+        GROUP BY b.user_id, b.odoc_sn
+            ),
+            today_dtl AS (
+        SELECT
+            d.user_id,
+            d.odoc_sn,
+            d.odoc_day_sn,
+            d.odoc_memo
+        FROM t_odoc_dtl d
+            CROSS JOIN base_time bt
+        WHERE d.odoc_dt <![CDATA[ >= ]]> bt.today_kr
+          AND d.odoc_dt <![CDATA[ < ]]> bt.today_kr + INTERVAL '1 day'
+            )
+        SELECT
+            a.odoc_sn,
+            a.user_id,
+            a.odoc_nm,
+            TO_CHAR(a.frst_reg_dt, 'YYYY. MM. DD') AS frst_reg_dt,
+            a.end_yn,
+            a.odoc_type,
+            TO_CHAR(bt.today_kr, 'MM') AS odoc_month,
+            ROUND(
+                    COALESCE(ms.checked_day_count, 0)::numeric / bt.month_last_day * 100,
+                    1
+            ) AS progress,
+            CASE
+                WHEN td.odoc_sn IS NOT NULL THEN 1
+                ELSE 0
+                END AS odoc_yn,
+            a.odoc_fav_yn,
+            a.odoc_thema_type,
+            CASE
+                WHEN a.stream_mdf_dt IS NOT NULL
+                    AND a.stream_mdf_dt BETWEEN bt.today_kr - 1 AND bt.now_kr
+                    THEN a.stream_sn
+                ELSE 0
+                END AS stream_sn,
+            a.max_stream_sn,
+            COALESCE(TO_CHAR(a.odoc_alarm_time, 'HH24:MI'), '00:00') AS odoc_alarm_time,
+            a.odoc_alarm_yn,
+            td.odoc_memo,
+            td.odoc_day_sn
+        FROM t_odoc_main a
+                 CROSS JOIN base_time bt
+                 LEFT JOIN month_stat ms
+                           ON a.user_id = ms.user_id
+                               AND a.odoc_sn = ms.odoc_sn
+                 LEFT JOIN today_dtl td
+                           ON a.user_id = td.user_id
+                               AND a.odoc_sn = td.odoc_sn
+        WHERE a.user_id = #{userId}
+          AND a.odoc_sn = #{odocSn}
     </select>
 
     <select id="getHistYearList" parameterType="com.anything.odoc.project.vo.ProjectMainVO" resultType="com.anything.odoc.project.vo.ProjectMainVO">
@@ -142,6 +168,10 @@
                 ARRAY_AGG(to_char(b.odoc_dt, 'HH24시 MI분')),
                 ','
             ) AS checked_timestamps
+            , ARRAY_TO_STRING(
+                ARRAY_AGG(COALESCE(b.odoc_memo, '')),
+                ','
+            ) AS checked_memos
             , ROUND(
                 COUNT(DISTINCT DATE(b.odoc_dt))::numeric
                 / EXTRACT(
@@ -230,12 +260,14 @@
         (
             odoc_sn
             , user_id
+            , odoc_memo
             , odoc_dt
             , frst_reg_dt
         )
         select
             #{odocSn}
             , #{userId}
+            , #{odocMemo}
             , (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
             , (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
         where not exists (
@@ -247,7 +279,6 @@
             AND d.odoc_dt <![CDATA[ < ]]>  (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')::date + interval '1 day'
         )
     </insert>
-
 
     <update id="updateStream" parameterType="com.anything.odoc.project.vo.ProjectMainVO">
         WITH prev AS (
@@ -354,5 +385,14 @@
             , #{userId}
         )
     </insert>
+
+    <update id="updateMemo" parameterType="com.anything.odoc.project.vo.ProjectMainVO">
+        /* ProjectMainDao.updateMemo */
+        UPDATE t_odoc_dtl
+        SET odoc_memo = #{odocMemo}
+        where odoc_sn = #{odocSn}
+            AND user_id = #{userId}
+            AND odoc_day_sn = #{odocDaySn}
+    </update>
 
 </mapper>

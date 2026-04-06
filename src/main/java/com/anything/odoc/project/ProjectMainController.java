@@ -100,6 +100,16 @@ public class ProjectMainController {
         return ResponseEntity.ok(Collections.singletonMap("result", result));
     }
 
+    @PostMapping("/updateMemo")
+    public ResponseEntity<Integer> updateMemo(@RequestBody ProjectMainVO projectMainVO) {
+        int result = projectMainService.updateMemo(projectMainVO);
+        if (result > 0) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping("/healthCheck")
     public String healthCheck() {
         return "ok";
