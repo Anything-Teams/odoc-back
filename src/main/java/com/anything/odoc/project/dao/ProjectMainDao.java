@@ -46,4 +46,6 @@ public interface ProjectMainDao {
     List<ThemaVO> selectThemaList(ThemaVO themaVO);
 
     int updateMemo(ProjectMainVO projectMainVO);
+
+    ProjectUserVO selectUserById(String userId);
 }
