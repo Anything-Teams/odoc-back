@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anything.odoc.project.dao.AutoLoginDao">
+
+    <insert id="upsertAutoLoginToken">
+        INSERT INTO t_user_auto_login (
+            user_id
+            , auto_login_token
+            , expire_dt
+            , frst_reg_dt
+            , last_mdf_dt
+        )
+        VALUES (
+            #{userId}
+            , #{token}
+            , #{expireDt}
+            , (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+            , (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+        )
+        ON CONFLICT (user_id)
+        DO UPDATE SET
+            auto_login_token = #{token}
+            , expire_dt = #{expireDt}
+            , last_mdf_dt = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Seoul')
+    </insert>
+
+    <select id="selectUserIdByToken" resultType="string">
+        SELECT user_id
+        FROM t_user_auto_login
+        WHERE auto_login_token = #{token}
+    </select>
+
+    <select id="selectExpireDtByToken" resultType="java.time.LocalDateTime">
+        SELECT expire_dt
+        FROM t_user_auto_login
+        WHERE auto_login_token = #{token}
+    </select>
+
+    <delete id="deleteAutoLoginByUserId">
+        DELETE FROM t_user_auto_login
+        WHERE user_id = #{userId}
+    </delete>
+
+    <delete id="deleteAutoLoginByToken">
+        DELETE FROM t_user_auto_login
+        WHERE auto_login_token = #{token}
+    </delete>
+
+</mapper>

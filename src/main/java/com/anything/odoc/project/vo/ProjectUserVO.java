@@ -13,4 +13,5 @@ public class ProjectUserVO extends PageVO {
     private String lastMdrDt;   /* 최종등록일시 */
     private String maxStreamSn;   /* 최대일수 */
     private String nickNm;    /* 닉네임 */
+    private String rememberMe;  /* 자동로그인 */
 }

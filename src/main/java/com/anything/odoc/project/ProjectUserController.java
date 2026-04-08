@@ -1,9 +1,13 @@
 package com.anything.odoc.project;
 
-import com.anything.odoc.project.vo.ProjectMainVO;
+import com.anything.odoc.project.dao.AutoLoginDao;
 import com.anything.odoc.project.vo.ProjectUserVO;
+import com.anything.odoc.utils.TokenUtils;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -13,11 +17,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
+@RequiredArgsConstructor
 @RestController
 public class ProjectUserController {
 
-    @Autowired
-    ProjectUserService projectUserService;
+    private final ProjectUserService projectUserService;
+    private final AutoLoginDao autoLoginDao;
 
     @PostMapping("/userRegister")
     public ResponseEntity<Integer> userRegister(@RequestBody ProjectUserVO projectUserVO){
@@ -35,7 +43,7 @@ public class ProjectUserController {
     }
 
     @PostMapping("/userLogin")
-    public ResponseEntity<ProjectUserVO> userLogin(@RequestBody ProjectUserVO projectUserVO, HttpSession session) {
+    public ResponseEntity<ProjectUserVO> userLogin(@RequestBody ProjectUserVO projectUserVO, HttpSession session, HttpServletResponse response) {
         ProjectUserVO loginUser = projectUserService.userLogin(projectUserVO);
 
         if (loginUser == null) {
@@ -50,25 +58,97 @@ public class ProjectUserController {
 
             session.setAttribute("SPRING_SECURITY_CONTEXT", context);
 
+            // 자동로그인 체크 시 remember-me 토큰 발급
+            if ("Y".equals(projectUserVO.getRememberMe())) {
+                String token = TokenUtils.generateRememberMeToken();
+
+                LocalDateTime expireDt = LocalDateTime.now(ZoneId.of("Asia/Seoul")).plusDays(30);
+
+                autoLoginDao.upsertAutoLoginToken(loginUser.getUserId(), token, expireDt);
+
+                Cookie cookie = new Cookie("remember-me", token);
+                cookie.setHttpOnly(true);
+                cookie.setSecure(true);
+                cookie.setPath("/");
+                cookie.setMaxAge(60 * 60 * 24 * 30);
+
+                response.addCookie(cookie);
+            }
+
             return ResponseEntity.ok(loginUser);
         }
     }
 
     @GetMapping("/sessionUser")
-    public ResponseEntity<ProjectUserVO> sessionUser(HttpSession session) {
+    public ResponseEntity<ProjectUserVO> sessionUser(
+            HttpSession session,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
         ProjectUserVO loginUser = (ProjectUserVO) session.getAttribute("loginUser");
 
-        if (loginUser == null) {
+        if (loginUser != null) {
+            return ResponseEntity.ok(loginUser);
+        }
+
+        String rememberMeToken = getCookieValue(request, "remember-me");
+
+        if (rememberMeToken == null || rememberMeToken.isBlank()) {
             return ResponseEntity.status(401).build();
         }
 
-        return ResponseEntity.ok(loginUser);
+        String userId = autoLoginDao.selectUserIdByToken(rememberMeToken);
+        LocalDateTime expireDt = autoLoginDao.selectExpireDtByToken(rememberMeToken);
+
+        if (userId == null || expireDt == null) {
+            expireRememberMeCookie(response);
+            return ResponseEntity.status(401).build();
+        }
+
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        if (expireDt.isBefore(now)) {
+            autoLoginDao.deleteAutoLoginByToken(rememberMeToken);
+            expireRememberMeCookie(response);
+            return ResponseEntity.status(401).build();
+        }
+
+        ProjectUserVO user = projectUserService.selectUserById(userId);
+
+        if (user == null) {
+            autoLoginDao.deleteAutoLoginByToken(rememberMeToken);
+            expireRememberMeCookie(response);
+            return ResponseEntity.status(401).build();
+        }
+
+        session.setAttribute("loginUser", user);
+
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(user, null, null);
+
+        SecurityContext context = SecurityContextHolder.getContext();
+        context.setAuthentication(auth);
+        session.setAttribute("SPRING_SECURITY_CONTEXT", context);
+
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/userLogout")
-    public ResponseEntity<?> logout(HttpSession session) {
+    public ResponseEntity<?> logout(
+            HttpSession session,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        String token = getCookieValue(request, "remember-me");
+
+        if (token != null && !token.isBlank()) {
+            autoLoginDao.deleteAutoLoginByToken(token);
+        }
+
+        expireRememberMeCookie(response);
+
         session.invalidate();
         SecurityContextHolder.clearContext();
+
         return ResponseEntity.ok(1);
     }
 
@@ -80,5 +160,27 @@ public class ProjectUserController {
         } else {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    private String getCookieValue(HttpServletRequest request, String cookieName) {
+        if (request.getCookies() == null) {
+            return null;
+        }
+
+        for (Cookie cookie : request.getCookies()) {
+            if (cookieName.equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
+    }
+
+    private void expireRememberMeCookie(HttpServletResponse response) {
+        Cookie cookie = new Cookie("remember-me", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
     }
 }

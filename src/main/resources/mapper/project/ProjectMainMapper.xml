@@ -395,4 +395,14 @@
             AND odoc_day_sn = #{odocDaySn}
     </update>
 
+    <select id="selectUserById" resultType="com.anything.odoc.project.vo.ProjectUserVO">
+        SELECT
+            USER_ID,
+            IS_MOTIVATION_ALERT,
+            ADMIN_YN,
+            MAX_STREAM_SN
+        FROM T_USER
+        WHERE USER_ID = #{userId}
+          AND USER_STATE = 'Y'
+    </select>
 </mapper>

@@ -29,6 +29,7 @@ public class SecurityConfig {
                                 "/test",
                                 "/testAccessToken",
                                 "/testPush",
+                                "/sessionUser",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**"

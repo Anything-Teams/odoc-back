@@ -44,4 +44,8 @@ public class ProjectUserService {
     public int updateAlert(ProjectUserVO projectUserVO) {
         return projectMainDao.updateAlert(projectUserVO);
     }
+
+    public ProjectUserVO selectUserById(String userId) {
+        return projectMainDao.selectUserById(userId);
+    }
 }
