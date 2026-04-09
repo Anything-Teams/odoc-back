@@ -88,7 +88,11 @@ public class ProjectUserController {
         ProjectUserVO loginUser = (ProjectUserVO) session.getAttribute("loginUser");
 
         if (loginUser != null) {
-            return ResponseEntity.ok(loginUser);
+            ProjectUserVO freshUser = projectUserService.selectUserById(loginUser.getUserId());
+            if (freshUser != null) {
+                session.setAttribute("loginUser", freshUser);
+                return ResponseEntity.ok(freshUser);
+            }
         }
 
         String rememberMeToken = getCookieValue(request, "remember-me");
