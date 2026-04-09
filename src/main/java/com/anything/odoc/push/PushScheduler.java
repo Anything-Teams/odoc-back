@@ -36,7 +36,7 @@ public class PushScheduler {
             try {
                 String title = "ODOC";
                 String body = "[" + target.getOdocNames() + "] 시간입니다";
-                String link = "https://odoc.vercel.app/projects?openOdocSn=" + target.getOdocSn();
+                String link = "https://odoc.vercel.app/projects/" + target.getOdocSn();
 //                String link = "http://localhost:3000/";
 
                 String response = fcmSendService.sendToToken(
