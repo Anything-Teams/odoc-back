@@ -34,7 +34,7 @@ public class PushScheduler {
 
         for (PushTargetVO target : targets) {
             try {
-                String title = "ODOC";
+                String title = "지금 한 번 체크해보세요!";
                 String body = "[" + target.getOdocNames() + "] 시간입니다";
                 String link = "https://odoc.vercel.app/projects?open=" + target.getOdocSn() + "&fromPush=1";
 //                String link = "http://localhost:3000/";
