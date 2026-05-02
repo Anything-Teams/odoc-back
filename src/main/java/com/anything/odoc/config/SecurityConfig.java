@@ -7,11 +7,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -19,31 +14,30 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-        .cors(Customizer.withDefaults())
-        .csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                        "/",
-                        "/login",
-                        "/userLogin",
-                        "/signup",
-                        "/userIdCheck",
-                        "/userRegister",
-                        "/healthCheck",
-                        "/sessionUser",
-                        "/test",
-                        "/testAccessToken",
-                        "/testPush",
-                        "/sessionUser",
-                        "/css/**",
-                        "/js/**",
-                        "/images/**",
-                        "/api/routine-shares",
-                        "/api/routine-shares/**"
-                ).permitAll()
-                .anyRequest().authenticated()
-        )
-        .formLogin(form -> form.disable());
+                .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/",
+                                "/login",
+                                "/userLogin",
+                                "/signup",
+                                "/userIdCheck",
+                                "/userRegister",
+                                "/healthCheck",
+                                "/sessionUser",
+                                "/test",
+                                "/testAccessToken",
+                                "/testPush",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/api/routine-shares",
+                                "/api/routine-shares/**"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form.disable());
 
         return http.build();
     }
@@ -51,32 +45,5 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:3000",
-                "https://odoc.vercel.app",
-                "http://10.0.2.2:8081"
-        ));
-
-        configuration.setAllowedOriginPatterns(List.of("*"));
-
-        configuration.setAllowedMethods(List.of(
-                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
-        ));
-
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
-
-        source.registerCorsConfiguration("/**", configuration);
-
-        return source;
     }
 }

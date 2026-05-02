@@ -19,6 +19,7 @@ public class RoutineShareController {
     public ResponseEntity<RoutineShareCreateRes> createShare(
             @RequestBody RoutineShareCreateReq req
     ) {
+        System.out.println("루틴 공유 API 진입");
         return ResponseEntity.ok(routineShareService.createShare(req));
     }
 
