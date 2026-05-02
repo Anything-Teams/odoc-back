@@ -18,26 +18,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/routine-shares").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/routine-shares/**").permitAll()
-                        .requestMatchers(
-                                "/",
-                                "/login",
-                                "/userLogin",
-                                "/signup",
-                                "/userIdCheck",
-                                "/userRegister",
-                                "/healthCheck",
-                                "/sessionUser",
-                                "/test",
-                                "/testAccessToken",
-                                "/testPush",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .formLogin(form -> form.disable());
 
