@@ -32,7 +32,9 @@ public class SecurityConfig {
                                 "/sessionUser",
                                 "/css/**",
                                 "/js/**",
-                                "/images/**"
+                                "/images/**",
+                                "/api/routine-shares",
+                                "/api/routine-shares/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
