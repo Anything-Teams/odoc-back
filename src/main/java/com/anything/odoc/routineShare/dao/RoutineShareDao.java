@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 @Mapper
-public interface RoutineShareMapper {
+public interface RoutineShareDao {
 
     int existsShareCode(@Param("shareCode") String shareCode);
 
