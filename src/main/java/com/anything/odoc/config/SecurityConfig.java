@@ -2,6 +2,7 @@ package com.anything.odoc.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,6 +18,9 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/routine-shares").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/routine-shares/**").permitAll()
                         .requestMatchers(
                                 "/",
                                 "/login",
@@ -31,9 +35,7 @@ public class SecurityConfig {
                                 "/testPush",
                                 "/css/**",
                                 "/js/**",
-                                "/images/**",
-                                "/api/routine-shares",
-                                "/api/routine-shares/**"
+                                "/images/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
