@@ -12,7 +12,8 @@ public class CorsConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins(
                     "http://localhost:3000",
-                    "https://odoc.vercel.app"
+                    "https://odoc.vercel.app",
+                    "http://10.0.2.2:8081"
                 )
                 .allowedMethods("*")
                 .allowedHeaders("*")
