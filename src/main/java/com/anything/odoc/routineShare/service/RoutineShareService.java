@@ -4,6 +4,7 @@ import com.anything.odoc.routineShare.dao.RoutineShareDao;
 import com.anything.odoc.routineShare.dto.RoutineShareCreateReq;
 import com.anything.odoc.routineShare.dto.RoutineShareCreateRes;
 import com.anything.odoc.routineShare.dto.RoutineShareImportRes;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import java.security.SecureRandom;
 public class RoutineShareService {
 
     private final RoutineShareDao routineShareDao;
+    private final ObjectMapper objectMapper;
 
     private static final String CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     private static final int CODE_LENGTH = 6;
@@ -28,7 +30,14 @@ public class RoutineShareService {
 
         String shareCode = createUniqueShareCode();
 
-        routineShareDao.insertSharedRoutine(shareCode, req);
+        String jsonString;
+        try {
+            jsonString = objectMapper.writeValueAsString(req.getRoutineJson());
+        } catch (Exception e) {
+            throw new RuntimeException("JSON 변환 실패", e);
+        }
+
+        routineShareDao.insertSharedRoutine(shareCode, jsonString, req);
 
         return new RoutineShareCreateRes(shareCode);
     }
