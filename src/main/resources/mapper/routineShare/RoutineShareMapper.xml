@@ -16,13 +16,19 @@
             share_code,
             routine_json,
             routine_name,
-            routine_type
+            routine_type,
+            creator_type,
+            creator_name,
+            creator_uid
         )
         VALUES (
             #{shareCode},
             CAST(#{jsonString} AS jsonb),
             #{req.routineName},
-            COALESCE(#{req.routineType}, 'lite')
+            COALESCE(#{req.routineType}, 'lite'),
+            COALESCE(#{req.creatorType}, 'guest'),
+            COALESCE(#{req.creatorName}, 'rutify-guest'),
+            COALESCE(#{req.creatorUid}, 'guest')
         )
     </insert>
 

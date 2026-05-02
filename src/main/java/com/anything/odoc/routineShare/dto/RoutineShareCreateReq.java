@@ -7,8 +7,9 @@ import lombok.Data;
 public class RoutineShareCreateReq {
 
     private String routineName;
-
     private String routineType;
-
     private JsonNode routineJson;
+    private String creatorType;
+    private String creatorName;
+    private String creatorUid;
 }
