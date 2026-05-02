@@ -32,14 +32,14 @@
             share_code AS shareCode,
             routine_name AS routineName,
             routine_type AS routineType,
-            routine_json AS routineJson
+            routine_json::text AS routineJson
         FROM shared_routines
         WHERE share_code = #{shareCode}
-        AND is_active = TRUE
-        AND (
+            AND is_active = TRUE
+            AND (
             expires_at IS NULL
             OR expires_at > CURRENT_TIMESTAMP
-        )
+            )
         LIMIT 1
     </select>
 
