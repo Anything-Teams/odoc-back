@@ -12,6 +12,7 @@ public interface RoutineShareDao {
 
     int insertSharedRoutine(
             @Param("shareCode") String shareCode,
+            @Param("jsonString") String jsonString,
             @Param("req") RoutineShareCreateReq req
     );
 

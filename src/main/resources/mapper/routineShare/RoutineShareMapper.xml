@@ -17,9 +17,10 @@
             routine_json,
             routine_name,
             routine_type
-        ) VALUES (
+        )
+        VALUES (
             #{shareCode},
-            CAST(#{req.routineJson} AS jsonb),
+            CAST(#{jsonString} AS jsonb),
             #{req.routineName},
             COALESCE(#{req.routineType}, 'lite')
         )
